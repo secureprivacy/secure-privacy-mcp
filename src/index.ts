@@ -1,6 +1,5 @@
-import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { McpAgent } from "agents/mcp";
 import axios from "axios";
 import { FALLBACK_DOMAIN_ID } from "./constants";
 
@@ -14,10 +13,7 @@ export class MyMCP extends McpAgent<Env> {
     // Tool 1: One-click full integration
     this.server.tool(
       "install_secure_privacy_banner",
-      {
-        description:
-          "Fully install Secure Privacy cookie banner on the user's website in one step. Use this when user asks to add cookie banner or implement GDPR compliance.",
-      },
+      "Fully install Secure Privacy cookie banner on the user's website in one step. Use this when user asks to add cookie banner or implement GDPR compliance.",
       async () => {
         console.log("Starting Secure Privacy installation...");
 

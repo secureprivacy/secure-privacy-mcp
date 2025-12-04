@@ -174,3 +174,8 @@ dist
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+
+# MCP Registry publishing files
+.mcpregistry_github_token
+.mcpregistry_registry_token

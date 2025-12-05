@@ -1,50 +1,191 @@
-# Building a Remote MCP Server on Cloudflare (Without Auth)
+# Secure Privacy MCP Server
 
-This example allows you to deploy a remote MCP server that doesn't require authentication on Cloudflare Workers. 
+A remote [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server that enables AI agents like Claude Desktop, GitHub Copilot, and Cursor to automatically integrate GDPR-compliant cookie consent banners into websites with a single command.
 
-## Get started: 
+Built on Cloudflare Workers, this MCP server provides a one-click solution for implementing Secure Privacy's cookie consent management platform, handling domain registration, template assignment, and script injection seamlessly.
+
+## What is MCP?
+
+The Model Context Protocol (MCP) is an open standard that enables AI assistants to securely connect to external tools and data sources. It allows AI agents to perform actions on your behalf, making complex multi-step workflows as simple as a single conversational request.
+
+## Key Features
+
+- **One-Click Installation**: Fully automate cookie banner deployment with a single AI command
+- **GDPR Compliant**: Automatically configure compliant consent management
+- **Multiple Consent Modes**: Support for Google Consent Mode (GCM), Microsoft UET, Meta, and more
+- **Template Management**: Auto-assign all available cookie banner templates
+- **No API Key Required**: Users don't need to provide any credentials
+- **AI Agent Compatible**: Works with Claude Desktop, GitHub Copilot, Cursor, and other MCP clients
+
+## Available Tools
+
+### `install_secure_privacy_banner`
+
+Fully install Secure Privacy cookie banner on a website in one step. This is the primary tool that orchestrates the entire installation process.
+
+**What it does:**
+1. **Registers a domain** with Secure Privacy
+2. **Assigns templates** - Fetches and assigns all available cookie banner templates (design + functional)
+3. **Generates the script tag** - Creates the integration code for your website
+4. **Configures consent modes** - Sets up Google Consent Mode (GCM), Microsoft UET, Meta, and more
+
+**Response includes:**
+- Domain URL registered
+- Domain ID for tracking
+- Number of templates assigned
+- Script tag for integration
+- Confirmation of GDPR compliance
+
+## Example Usage
+
+Simply ask your AI agent in natural language:
+
+```
+"Add a cookie banner to my website"
+"Make my site GDPR compliant"
+"Install Secure Privacy on my website"
+"I need cookie consent management"
+```
+
+The AI will automatically use the Secure Privacy MCP to set everything up and provide you with the script tag to add to your website.
+
+## Installation
+
+### Claude Desktop
+
+1. Install the [mcp-remote](https://www.npmjs.com/package/mcp-remote) proxy:
+   ```bash
+   npm install -g mcp-remote
+   ```
+
+2. Open Claude Desktop and go to **Settings > Developer > Edit Config**
+
+3. Add this configuration:
+   ```json
+   {
+     "mcpServers": {
+       "secure-privacy": {
+         "command": "npx",
+         "args": [
+           "mcp-remote",
+           "https://mcp.secureprivacy.ai/sse"
+         ]
+       }
+     }
+   }
+   ```
+
+4. Restart Claude Desktop
+
+5. Start using it! Ask Claude: "Add a cookie banner to my website"
+
+### GitHub Copilot (VS Code)
+
+1. Install the [mcp-remote](https://www.npmjs.com/package/mcp-remote) package globally:
+   ```bash
+   npm install -g mcp-remote
+   ```
+
+2. Open VS Code Settings (JSON) and add the MCP configuration:
+   ```json
+   {
+     "github.copilot.chat.mcp.servers": {
+       "secure-privacy": {
+         "command": "npx",
+         "args": [
+           "mcp-remote",
+           "https://mcp.secureprivacy.ai/sse"
+         ]
+       }
+     }
+   }
+   ```
+
+3. Restart VS Code
+
+4. Use Copilot Chat and ask: "Add Secure Privacy cookie banner to my site"
+
+### Cursor
+
+1. Install the [mcp-remote](https://www.npmjs.com/package/mcp-remote) proxy:
+   ```bash
+   npm install -g mcp-remote
+   ```
+
+2. Open Cursor Settings and navigate to the MCP configuration
+
+3. Add the Secure Privacy MCP server:
+   ```json
+   {
+     "mcpServers": {
+       "secure-privacy": {
+         "command": "npx",
+         "args": [
+           "mcp-remote",
+           "https://mcp.secureprivacy.ai/sse"
+         ]
+       }
+     }
+   }
+   ```
+
+4. Restart Cursor
+
+5. Chat with the AI and request: "Install cookie consent on my website"
+
+## Troubleshooting
+
+### Connection Issues
+
+If the MCP server doesn't appear in your AI client:
+- Verify the URL is correct: `https://mcp.secureprivacy.ai/sse`
+- Restart your AI client after updating the configuration
+- Check that `mcp-remote` is properly installed by running: `npm list -g mcp-remote`
+- Make sure you have an active internet connection
+
+### MCP Not Showing Up
+
+- Ensure the configuration file syntax is correct (valid JSON)
+- Check for typos in the server URL
+- Try reinstalling `mcp-remote`: `npm install -g mcp-remote`
+- Verify your AI client supports MCP (check version requirements)
+
+### Script Already Exists
+
+If you see a message that the script is already present, that's normal! The MCP automatically detects existing Secure Privacy installations and won't duplicate the script tag.
+
+## Development
+
+### Get Started
+
+Deploy to Cloudflare Workers:
 
 [![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/ai/tree/main/demos/remote-mcp-authless)
 
-This will deploy your MCP server to a URL like: `remote-mcp-server-authless.<your-account>.workers.dev/sse`
-
-Alternatively, you can use the command line below to get the remote MCP Server created on your local machine:
+Or use the command line:
 ```bash
 npm create cloudflare@latest -- my-mcp-server --template=cloudflare/ai/demos/remote-mcp-authless
 ```
 
-## Customizing your MCP Server
+### Customizing the MCP Server
 
-To add your own [tools](https://developers.cloudflare.com/agents/model-context-protocol/tools/) to the MCP server, define each tool inside the `init()` method of `src/index.ts` using `this.server.tool(...)`. 
+To add your own [tools](https://developers.cloudflare.com/agents/model-context-protocol/tools/) to the MCP server, define each tool inside the `init()` method of `src/index.ts` using `this.server.tool(...)`.
 
-## Connect to Cloudflare AI Playground
+### Testing with Cloudflare AI Playground
 
-You can connect to your MCP server from the Cloudflare AI Playground, which is a remote MCP client:
+You can test your MCP server from the Cloudflare AI Playground:
 
 1. Go to https://playground.ai.cloudflare.com/
-2. Enter your deployed MCP server URL (`remote-mcp-server-authless.<your-account>.workers.dev/sse`)
-3. You can now use your MCP tools directly from the playground!
+2. Enter your deployed MCP server URL (`mcp.secureprivacy.ai/sse`)
+3. Use your MCP tools directly from the playground
 
-## Connect Claude Desktop to your MCP server
+## Need Help?
 
-You can also connect to your remote MCP server from local MCP clients, by using the [mcp-remote proxy](https://www.npmjs.com/package/mcp-remote). 
+For additional support:
+- **Secure Privacy Support**: [Contact support](https://secureprivacy.ai/contact-us)
+- **Documentation**: [Browse our docs](https://docs.secureprivacy.ai)
+- **Email**: support@secureprivacy.ai
 
-To connect to your MCP server from Claude Desktop, follow [Anthropic's Quickstart](https://modelcontextprotocol.io/quickstart/user) and within Claude Desktop go to Settings > Developer > Edit Config.
+## License
 
-Update with this configuration:
-
-```json
-{
-  "mcpServers": {
-    "calculator": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "http://localhost:8787/sse"  // or remote-mcp-server-authless.your-account.workers.dev/sse
-      ]
-    }
-  }
-}
-```
-
-Restart Claude and you should see the tools become available. 
+See LICENSE file for details. 
